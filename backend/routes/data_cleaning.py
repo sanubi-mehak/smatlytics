@@ -16,6 +16,7 @@ os.makedirs(CLEAN_FOLDER, exist_ok=True)
 
 @data_clean.route("/upload-clean", methods=["POST"])
 def upload_and_clean():
+
     # -----------------------------
     # 1. File upload
     # -----------------------------
@@ -40,13 +41,13 @@ def upload_and_clean():
         return jsonify({"error": str(e)}), 500
 
     # -----------------------------
-    # 3. DATA CLEANING
+    # 3. BASIC CLEANING
     # -----------------------------
 
-    # Remove duplicate rows
+    # Remove duplicates
     df = df.drop_duplicates()
 
-    # Remove completely empty rows
+    # Remove fully empty rows
     df = df.dropna(how="all")
 
     # Standardize column names
@@ -57,23 +58,30 @@ def upload_and_clean():
         .str.replace(" ", "_")
     )
 
-    # Convert numeric columns
-    for col in df.columns:
-        df[col] = pd.to_numeric(df[col], errors="ignore")
+    # -----------------------------
+    # 4. DATE HANDLING (FIXED)
+    # -----------------------------
+    date_columns = []
 
-    # Fill missing numeric values with median
-    numeric_cols = df.select_dtypes(include=np.number).columns
-    df[numeric_cols] = df[numeric_cols].fillna(
-        df[numeric_cols].median()
-    )
-
-    # Convert date columns ONLY if name suggests date
     for col in df.columns:
-        if "date" in col or "time" in col:
+        if any(keyword in col for keyword in ["date", "time", "dob", "founded"]):
             df[col] = pd.to_datetime(df[col], errors="coerce")
+            date_columns.append(col)
 
     # -----------------------------
-    # 4. HANDLE OUTLIERS (SAFE WAY)
+    # 5. NUMERIC HANDLING (SAFE)
+    # -----------------------------
+    for col in df.columns:
+        if col not in date_columns:
+            df[col] = pd.to_numeric(df[col], errors="ignore")
+
+    numeric_cols = df.select_dtypes(include=np.number).columns
+
+    # Fill missing numeric values with median
+    df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].median())
+
+    # -----------------------------
+    # 6. HANDLE OUTLIERS (CLIP)
     # -----------------------------
     for col in numeric_cols:
         Q1 = df[col].quantile(0.25)
@@ -83,24 +91,45 @@ def upload_and_clean():
         lower = Q1 - 1.5 * IQR
         upper = Q3 + 1.5 * IQR
 
-        # Clip instead of deleting rows
         df[col] = np.clip(df[col], lower, upper)
 
     # -----------------------------
-    # 5. Save cleaned file
+    # 7. FORMAT DATE COLUMNS (CRITICAL)
+    # -----------------------------
+    for col in date_columns:
+        df[col] = df[col].dt.strftime("%Y-%m-%d")
+
+    # -----------------------------
+    # 8. SAVE CLEANED FILE (FIXED)
     # -----------------------------
     clean_filename = "cleaned_data.xlsx"
     clean_path = os.path.join(CLEAN_FOLDER, clean_filename)
-    df.to_excel(clean_path, index=False)
+
+    with pd.ExcelWriter(
+        clean_path,
+        engine="xlsxwriter",
+        datetime_format="yyyy-mm-dd"
+    ) as writer:
+
+        df.to_excel(writer, index=False, sheet_name="Cleaned Data")
+        worksheet = writer.sheets["Cleaned Data"]
+
+        # Auto-adjust column width (prevents ########)
+        for i, col in enumerate(df.columns):
+            max_len = max(
+                df[col].astype(str).map(len).max(),
+                len(col)
+            )
+            worksheet.set_column(i, i, max_len + 3)
 
     # -----------------------------
-    # 6. Detect schema & dashboard
+    # 9. SCHEMA & DASHBOARD
     # -----------------------------
     schema_type = detect_schema(df.columns)
     dashboard_config = get_dashboard_config(schema_type)
 
     # -----------------------------
-    # 7. Return JSON response
+    # 10. RESPONSE
     # -----------------------------
     return jsonify({
         "message": "File cleaned successfully",
@@ -113,7 +142,7 @@ def upload_and_clean():
 
 
 # -----------------------------
-# 8. DOWNLOAD ROUTE
+# DOWNLOAD ROUTE
 # -----------------------------
 @data_clean.route("/cleaned/<filename>")
 def download_cleaned_file(filename):
