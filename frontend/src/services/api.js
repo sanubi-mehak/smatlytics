@@ -1,10 +1,4 @@
-// src/services/api.js
-
 export const uploadAndClean = async (file) => {
-  if (!file) {
-    throw new Error("No file selected");
-  }
-
   const formData = new FormData();
   formData.append("file", file);
 
@@ -14,13 +8,8 @@ export const uploadAndClean = async (file) => {
   });
 
   if (!response.ok) {
-    let errorMessage = "Failed to upload or clean file";
-    try {
-      const errorData = await response.json();
-      errorMessage = errorData.message || errorMessage;
-    } catch (err) {}
-    throw new Error(errorMessage);
+    throw new Error("Upload failed");
   }
 
-  return response;
+  return response.json(); // ⬅️ JSON, NOT blob
 };

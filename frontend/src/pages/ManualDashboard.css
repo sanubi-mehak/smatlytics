@@ -1,0 +1,48 @@
+.manual-dashboard {
+  padding: 15px;
+  background: #f1f5f9;
+}
+
+.top-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.dashboard-layout {
+  display: flex;
+  gap: 10px;
+}
+
+.canvas {
+  flex: 3;
+  height: 80vh;
+  background: white;
+  border-radius: 6px;
+  position: relative;
+}
+
+.toolbox {
+  flex: 1;
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.toolbox button {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.widget {
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 5px;
+  height: 100%;
+}
+
+.delete {
+  float: right;
+  cursor: pointer;
+  color: red;
+}

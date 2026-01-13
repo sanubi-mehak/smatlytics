@@ -36,19 +36,19 @@ function AnalyticsHub() {
       stats: { items: 22, views: "2.3k", lastRun: "30m" },
     },
     {
-      title: "Anomaly Detection",
+      title: "Manually Create Dashboards",
       desc: "Spot unusual patterns automatically",
-      path: "/anomaly",
-      icon: "⚠️",
+      path: "/manual-dashboard",
+      icon: "🔍",
       stats: { items: 3, views: "210", lastRun: "3h" },
     },
     {
-      title: "Time Series Explorer",
-      desc: "Interactive time series viewer",
-      path: "/timeseries",
-      icon: "⏱️",
-      stats: { items: 8, views: "540", lastRun: "5h" },
-    },
+  title: "AI Insights",
+  desc: "AI-powered trends, predictions & chatbot",
+  path: "/ai-insights",
+  icon: "🧠",
+}
+,
     {
       title: "Model Manager",
       desc: "Train and deploy ML models",

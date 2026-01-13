@@ -1,0 +1,84 @@
+.dashboard-page {
+  padding: 20px 30px;
+  min-height: 100vh;
+  background: linear-gradient(to right, #eef2ff, #ecfeff);
+}
+
+/* TITLE */
+.dashboard-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+/* FILE UPLOAD */
+.file-upload {
+  margin-bottom: 20px;
+}
+
+/* 🔹 SUMMARY CARDS (MULTIPLE ON TOP) */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+
+
+/* 🔹 CHARTS GRID */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* 🔹 CHART CARD */
+.chart-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  height: 360px; /* IMPORTANT */
+  display: flex;
+  flex-direction: column;
+}
+
+/* CHART TITLE */
+.chart-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.pdf-btn {
+  display: block;
+  margin: 0 auto 25px auto;
+  padding: 10px 18px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.pdf-btn:hover {
+  background: #1e40af;
+}

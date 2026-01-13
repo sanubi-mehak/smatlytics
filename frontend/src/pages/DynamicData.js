@@ -13,19 +13,20 @@ function DynamicData() {
     setError("");
 
     try {
-      const response = await uploadAndClean(file);
+      const result = await uploadAndClean(file);
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      // ✅ download cleaned file
+      const downloadUrl = `http://localhost:5000${result.download_url}`;
 
       const a = document.createElement("a");
-      a.href = url;
+      a.href = downloadUrl;
       a.download = "cleaned_data.xlsx";
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      a.remove();
+
     } catch (err) {
-      setError(err.message || "Failed to upload or clean file");
+      setError("Failed to upload or clean file");
     } finally {
       setLoading(false);
     }
@@ -34,37 +35,19 @@ function DynamicData() {
   return (
     <div className="data-clean">
       <div className="data-clean__card">
-        <h2 className="data-clean__title">
-          📤 Raw Data Upload & Auto Cleaning
-        </h2>
+        <h2>📤 Raw Data Upload & Auto Cleaning</h2>
 
-        <div className="data-clean__file">
-          <input
-            id="data-file-input"
-            className="data-clean__file-input"
-            type="file"
-            accept=".csv,.xlsx"
-            onChange={(e) => setFile(e.target.files[0])}
-          />
+        <input
+          type="file"
+          accept=".csv,.xlsx"
+          onChange={(e) => setFile(e.target.files[0])}
+        />
 
-          <label htmlFor="data-file-input" className="data-clean__file-button">
-            📁 {file ? "Change file" : "Choose file"}
-          </label>
-
-          <div className="data-clean__filename">
-            {file ? file.name : "Accepted: .csv, .xlsx"}
-          </div>
-        </div>
-
-        <button
-          className="data-clean__button"
-          onClick={handleUpload}
-          disabled={!file || loading}
-        >
+        <button onClick={handleUpload} disabled={!file || loading}>
           {loading ? "Cleaning..." : "Upload & Clean"}
         </button>
 
-        {error && <div className="data-clean__error">❌ {error}</div>}
+        {error && <p style={{ color: "red" }}>❌ {error}</p>}
       </div>
     </div>
   );
